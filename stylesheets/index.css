@@ -81,6 +81,7 @@ body {
   width: 80%;
   max-width: 700px;
   max-height: 90%;
+  text-align: justify;
 
   transform: translate(-50%, -50%);
   position: absolute;
