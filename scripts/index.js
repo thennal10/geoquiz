@@ -62,7 +62,7 @@ $(function () {
     });
 
     // Init map
-    mapboxgl.accessToken = 'sk.eyJ1IjoicHJlbWVkaXRhdG9yIiwiYSI6ImNrZDNkMGM4YzFkengyeHF2a2Nkc2JpM2QifQ.JfVUlxt6l2SeJ9zyQM9v8w';
+    mapboxgl.accessToken = 'pk.eyJ1IjoicHJlbWVkaXRhdG9yIiwiYSI6ImNrZDNlYmI1bzFtaXUyc3B2dzZscWkwMTgifQ.ngnb5HaLQsS9B1oT5y8oXA';
     var map = new mapboxgl.Map({
         container: 'map',
         style: 'mapbox://styles/premeditator/ckcxq6d5x13w61imu4vpp9gjc', // mapbox stylesheet location
