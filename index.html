@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geoquiz</title>
+    <script src='https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="scripts/index.js"></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v1.11.1/mapbox-gl.css' rel='stylesheet' />
+    <link href="stylesheets/index.css" rel='stylesheet' />
+</head>
+<body>
+    <div id='map'></div>
+    <div id="top-wrapper">
+        <div id="start-button">Start</div>
+        <div id="playing-wrapper">
+            <div id="country-prompter"></div>
+            <div id="scores-wrapper">
+                <div id="scores">
+                    <span id="scores-total">Score:</span>
+                    <span id="scores-plus"></span>
+                </div>
+                <div id="countries">
+                    Countries: <span class="current-country"></span>/<span class="total-countries">
+                </div>
+                <div id="skip">Skip</div>
+                <div id="about-button">About</div>
+            </div>
+        </div>
+    </div>
+    <div id="about">
+        <div id="about-content">
+            <span class="close">&times;</span>
+            <h1>About</h1>
+            <p>Made because coronavirus sucks and I'm very bored. Open up issues on the github repo if something breaks.</p>
+            <h2>Score calculution</h2>
+            <p>
+                The distance between the country you guessed and the actual country is calculated with a modified version of
+                the Haversine forumla that gives a maximum value of 1. That value is fed into a steep exponentially
+                decreasing function (<i>y = e<sup>-8x</sup></i>) to give a score between 0 and 1. Obviously, this system
+                will be a lot more lenient for, say, guessing countries in Europe as opposed to guessing countries in Africa,
+                but I had to make a compromise.
+            </p>
+            <h2><span class="total-countries"></span> countries? There are only X in the world!</h2>
+            <p>
+                A - Eat shit. B - The UN recognizes 193 countries as, well, countries, but the only internationally recognized
+                system
+                that uniformly assigns an <i>identifier</i> to each "country" is the ISO 3166 standard, which lists 249 designated
+                territories. This, however, includes dependant territories, and the quiz is hard enough without them, so I
+                pruned a lot of em out. However, I did leave in some well known ones, like Greenland, along with Hong Kong, Taiwan,
+                and Macau because fuck China. No Vatican too, because fuck the pope and also the map data I'm using isn't detailed enough
+                to actually include a country that small. 
+            </p>
+        </div>
+    
+    </div>
+    <div id="totals-wrapper">
+        <h1>Congratulations!</h1>
+        <p>You wasted however many minutes doing something completely pointless!</p>
+        <a class="about" href="about.html">Any questions?</a>
+        <h3>Score: <span id="final-score"></span>, or <span id="final-score-perc"></span></h3>
+        <h3>Accuracy: <span id="final-abs-score"></span>, or <span id="final-abs-score-perc"></span></h3>
+    </div>
+</body>
+</html>
