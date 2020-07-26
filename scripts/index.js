@@ -52,7 +52,7 @@ $(function () {
         }
     };
     // Get a list of countries (this is an utter bodge but hey it works)
-    $.getJSON("https://raw.githubusercontent.com/thennal10/country-quiz/master/data/country_centroids.json", function (json) {
+    $.getJSON("https://raw.githubusercontent.com/thennal10/geoquiz/master/data/country_centroids.json", function (json) {
         Game.allCountries = json;
         Game.totalCountryNum = json.length;
         for (i = 0; i < json.length; i++) {
