@@ -84,15 +84,16 @@ $(function () {
     // Highlighting for selection
     map.on('mousemove', 'countries', function (e) {
         var features = map.queryRenderedFeatures(e.point);
+        console.log(features)
 
         // Change the cursor style as a UI indicator.
         map.getCanvas().style.cursor = 'pointer';
-        map.setFilter('highlighted', ['in', 'ISO_A3', features[0]['properties']['ISO_A3']]);
+        map.setFilter('highlighted', ['in', 'ADM0_A3_IS', features[0]['properties']['ADM0_A3_IS']]);
     });
 
     map.on('mouseleave', 'countries', function () {
         map.getCanvas().style.cursor = '';
-        map.setFilter('highlighted', ['in', 'ISO_A3', '']);
+        map.setFilter('highlighted', ['in', 'ADM0_A3_IS', '']);
     });
 
     // Clickity click
@@ -102,7 +103,7 @@ $(function () {
             
             correct_code = Game.currentCountry['alpha3Code'];
             correct_location = Game.currentCountry['latlng'];
-            guess_code = features[0]['properties']['ISO_A3'];
+            guess_code = features[0]['properties']['ADM0_A3_IS'];
             guess_location = Game.countriesConvert[guess_code];
 
             // If you just clicked on a country you've already guessed
@@ -117,11 +118,11 @@ $(function () {
                     var score = 1; // full score for correct guess
                     Game.absScore += 1;
                     Game.correctCountriesISO.push(correct_code);
-                    map.setFilter('correct', ['in', 'ISO_A3'].concat(Game.correctCountriesISO));
+                    map.setFilter('correct', ['in', 'ADM0_A3_IS'].concat(Game.correctCountriesISO));
                 } else {
                     var score = getScore(guess_location, correct_location); // calc score using distance
                     Game.incorrectCountriesISO.push(correct_code);
-                    map.setFilter('incorrect', ['in', 'ISO_A3'].concat(Game.incorrectCountriesISO));
+                    map.setFilter('incorrect', ['in', 'ADM0_A3_IS'].concat(Game.incorrectCountriesISO));
                 }
 
                 // Fly to the correct location
@@ -155,7 +156,7 @@ $(function () {
         var correct_code = Game.currentCountry['alpha3Code'];
         Game.previousCountriesISO.push(correct_code);
         Game.incorrectCountriesISO.push(correct_code);
-        map.setFilter('incorrect', ['in', 'ISO_A3'].concat(Game.incorrectCountriesISO));
+        map.setFilter('incorrect', ['in', 'ADM0_A3_IS'].concat(Game.incorrectCountriesISO));
 
         // Fly to the correct location
         map.flyTo({ center: Game.currentCountry['latlng'].reverse() });
