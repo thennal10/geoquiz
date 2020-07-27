@@ -1,36 +1,39 @@
 $(function () {
     // A global object to keep track of all the game variables and methods
     var Game = {
-        allCountries: NaN,
-        totalCountryNum: NaN,
-        countriesConvert: {},
-        currentCountry: NaN,
-        currentCountryIndex: -1,
-        previousCountriesISO: [],
-        correctCountriesISO: [],
-        incorrectCountriesISO: [],
-        playing: false,
+        allCountries: [], // Complete list of countries as objects
+        // Hardcoded list of countries that aren't supposed to get asked
+        banlistISO: ['ALA', 'ASM', 'AIA', 'ABW', 'BMU', 'BES', 'BVT', 'IOT', 'CYM', 'CXR', 'CCK', 'COK', 'CUW', 'FLK', 'FRO', 'GUF', 'PYF', 'ATF', 'GIB', 'GLP', 'GUM', 'GGY', 'HMD', 'VAT', 'IMN', 'JEY', 'MTQ', 'MYT', 'MSR', 'NCL', 'NIU', 'NFK', 'MNP', 'PCN', 'REU', 'BLM', 'SHN', 'MAF', 'SPM', 'SXM', 'SGS', 'SJM', 'TKL', 'TCA', 'UMI', 'VGB', 'VIR', 'WLF', 'ESH'],
+        playableCountries: [], // The ones that actually get asked
+        playableCountryNum: NaN,
+        countriesConvert: {}, // For quick conversion from alpha3 codes to coords
+        currentCountry: NaN, // Country object
+        currentCountryIndex: -1, // In the playable countries list
+        previousCountriesISO: [], // All previous countries (A3 codes)
+        correctCountriesISO: [], // Countries guessed correctly
+        incorrectCountriesISO: [], // Countries guessed wrong
+        playing: false, // Whether the game has started
         score: 0,
-        absScore: 0,
+        absScore: 0, // 1 for getting it exactly right, 0 otherwise
         startGame() {
             console.log("Game starting!");
 
             // Updates game state
             this.playing = true;
-            shuffle(this.allCountries);
+            shuffle(this.playableCountries);
+            console.log(this.playableCountries);
 
             // Starts the game
             this.nextCountry();
         },
         nextCountry() {
             // If the game ended
-            if (this.currentCountryIndex === (this.totalCountryNum - 1)) {
+            if (this.currentCountryIndex === (this.playableCountryNum - 1)) {
                 this.finishGame();
             } else {
                 // Updates game state
                 this.currentCountryIndex += 1;
-                this.currentCountry = this.allCountries[this.currentCountryIndex];
-                console.log(this.currentCountry)
+                this.currentCountry = this.playableCountries[this.currentCountryIndex];
 
                 // Updates all the UI 
                 $("#country-prompter").text(this.currentCountry.name);
@@ -42,23 +45,31 @@ $(function () {
             $('#totals-wrapper').show();
             $('#playing-wrapper').addClass('slideup');
 
-            $('#final-score').text(this.score.toFixed(2) + '/' + this.totalCountryNum);
-            $('#final-score-perc').text(((this.score * 100) / this.totalCountryNum).toFixed(2) + '%');
-            $('#final-score-perc').css("color", getColor(this.score / this.totalCountryNum));
+            $('#final-score').text(this.score.toFixed(2) + '/' + this.playableCountryNum);
+            $('#final-score-perc').text(((this.score * 100) / this.playableCountryNum).toFixed(2) + '%');
+            $('#final-score-perc').css("color", getColor(this.score / this.playableCountryNum));
 
-            $('#final-abs-score').text(this.absScore.toFixed(2) + '/' + this.totalCountryNum);
-            $('#final-abs-score-perc').text(((this.absScore * 100) / this.totalCountryNum).toFixed(2) + '%');
-            $('#final-abs-score-perc').css("color", getColor(this.absScore / this.totalCountryNum));
+            $('#final-abs-score').text(this.absScore.toFixed(2) + '/' + this.playableCountryNum);
+            $('#final-abs-score-perc').text(((this.absScore * 100) / this.playableCountryNum).toFixed(2) + '%');
+            $('#final-abs-score-perc').css("color", getColor(this.absScore / this.playableCountryNum));
         }
     };
-    // Get a list of countries (this is an utter bodge but hey it works)
-    $.getJSON("https://raw.githubusercontent.com/thennal10/geoquiz/master/data/country_centroids.json", function (json) {
+    // Get a list of countries
+    $.getJSON("https://restcountries.eu/rest/v2/all", function (json) {
         Game.allCountries = json;
-        Game.totalCountryNum = json.length;
-        for (i = 0; i < json.length; i++) {
-            Game.countriesConvert[json[i]["A3"]] = json[i]["latlng"];
+
+        for (var country of json) {
+            // Adds every country to playableCountries except the ones in the banlist
+            if (Game.banlistISO.indexOf(country["alpha3Code"]) == -1) {
+                Game.playableCountries.push(country);
+            };
+
+            // An object for quick conversion from alpha3 codes to coords
+            Game.countriesConvert[country["alpha3Code"]] = country["latlng"];
         };
-        $('.total-countries').text(json.length) // Set the total country length for any element that uses it
+        Game.playableCountryNum = Game.playableCountries.length;
+
+        $('.total-countries').text(Game.playableCountryNum); // Set the total country length for any element that uses it
     });
 
     // Init map
@@ -73,14 +84,15 @@ $(function () {
     // Highlighting for selection
     map.on('mousemove', 'countries', function (e) {
         var features = map.queryRenderedFeatures(e.point);
+
         // Change the cursor style as a UI indicator.
         map.getCanvas().style.cursor = 'pointer';
-        map.setFilter('highlighted', ['in', 'ADM0_A3', features[0]['properties']['ADM0_A3']]);
+        map.setFilter('highlighted', ['in', 'ISO_A3', features[0]['properties']['ISO_A3']]);
     });
 
     map.on('mouseleave', 'countries', function () {
         map.getCanvas().style.cursor = '';
-        map.setFilter('highlighted', ['in', 'ADM0_A3', '']);
+        map.setFilter('highlighted', ['in', 'ISO_A3', '']);
     });
 
     // Clickity click
@@ -88,9 +100,9 @@ $(function () {
         if (Game.playing) {
             var features = map.queryRenderedFeatures(e.point);
             
-            correct_code = Game.currentCountry['A3'];
+            correct_code = Game.currentCountry['alpha3Code'];
             correct_location = Game.currentCountry['latlng'];
-            guess_code = features[0]['properties']['ADM0_A3'];
+            guess_code = features[0]['properties']['ISO_A3'];
             guess_location = Game.countriesConvert[guess_code];
 
             // If you just clicked on a country you've already guessed
@@ -105,11 +117,11 @@ $(function () {
                     var score = 1; // full score for correct guess
                     Game.absScore += 1;
                     Game.correctCountriesISO.push(correct_code);
-                    map.setFilter('correct', ['in', 'ADM0_A3'].concat(Game.correctCountriesISO));
+                    map.setFilter('correct', ['in', 'ISO_A3'].concat(Game.correctCountriesISO));
                 } else {
                     var score = getScore(guess_location, correct_location); // calc score using distance
                     Game.incorrectCountriesISO.push(correct_code);
-                    map.setFilter('incorrect', ['in', 'ADM0_A3'].concat(Game.incorrectCountriesISO));
+                    map.setFilter('incorrect', ['in', 'ISO_A3'].concat(Game.incorrectCountriesISO));
                 }
 
                 // Fly to the correct location
@@ -140,10 +152,10 @@ $(function () {
     // When the skip button is clicked
     $('#skip').click(function () {
         // Adds it to the list of previous countries and sets the filter
-        var correct_code = Game.currentCountry['A3'];
+        var correct_code = Game.currentCountry['alpha3Code'];
         Game.previousCountriesISO.push(correct_code);
         Game.incorrectCountriesISO.push(correct_code);
-        map.setFilter('incorrect', ['in', 'ADM0_A3'].concat(Game.incorrectCountriesISO));
+        map.setFilter('incorrect', ['in', 'ISO_A3'].concat(Game.incorrectCountriesISO));
 
         // Fly to the correct location
         map.flyTo({ center: Game.currentCountry['latlng'].reverse() });
