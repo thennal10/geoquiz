@@ -81,61 +81,106 @@ $(function () {
         zoom: 2 // starting zoom
     });
 
-    // Highlighting for selection
-    map.on('mousemove', 'countries', function (e) {
-        var features = map.queryRenderedFeatures(e.point);
+    
+    var countryID = null; // Used for feature-states
 
-        // Change the cursor style as a UI indicator.
-        map.getCanvas().style.cursor = 'pointer';
-        map.setFilter('highlighted', ['in', 'ADM0_A3_IS', features[0]['properties']['ADM0_A3_IS']]);
-    });
+    map.on('load', function () {
+        // The highlight layer is created at runtime so that we can use feature-states
+        // Which is faster at updating than using the filter method
+        map.addSource('natearth', {
+            'type': 'vector',
+            'url': 'mapbox://premeditator.6tq1dh43',
+            'generateId': true // This ensures that all features have unique IDs
+        });
 
-    map.on('mouseleave', 'countries', function () {
-        map.getCanvas().style.cursor = '';
-        map.setFilter('highlighted', ['in', 'ADM0_A3_IS', '']);
-    });
-
-    // Clickity click
-    map.on('click', 'countries',  function (e) {
-        if (Game.playing) {
-            var features = map.queryRenderedFeatures(e.point);
-            
-            correct_code = Game.currentCountry['alpha3Code'];
-            correct_location = Game.currentCountry['latlng'];
-            guess_code = features[0]['properties']['ADM0_A3_IS'];
-            guess_location = Game.countriesConvert[guess_code];
-
-            // If you just clicked on a country you've already guessed
-            if (Game.previousCountriesISO.includes(guess_code)) {
-                /// TODO
-            } else {
-                // Adds it to the list of previous countries
-                Game.previousCountriesISO.push(correct_code);
-
-                // If the guess is correct, stores the value in a variable and updates the filter 
-                if (correct_code === guess_code) {
-                    var score = 1; // full score for correct guess
-                    Game.absScore += 1;
-                    Game.correctCountriesISO.push(correct_code);
-                    map.setFilter('correct', ['in', 'ADM0_A3_IS'].concat(Game.correctCountriesISO));
-                } else {
-                    var score = getScore(guess_location, correct_location); // calc score using distance
-                    Game.incorrectCountriesISO.push(correct_code);
-                    map.setFilter('incorrect', ['in', 'ADM0_A3_IS'].concat(Game.incorrectCountriesISO));
-                }
-
-                // Fly to the correct location
-                map.flyTo({center: correct_location.reverse()});
-
-                // Yeets score to score-plus span and sets its color
-                $('#scores-plus').text('+' + score.toFixed(2));
-                $('#scores-plus').css("color", getColor(score));
-
-                // Updates the score
-                Game.score += score;
-                Game.nextCountry();
+        map.addLayer({
+            'id': 'highlight',
+            'type': 'fill',
+            'source': 'natearth',
+            'source-layer': 'ne_10m_admin_0_countries-67qiye',
+            'paint': {
+                'fill-color': '#000000',
+                'fill-opacity': [
+                    'case',
+                    ['boolean', ['feature-state', 'hover'], false],
+                    0.08,
+                    0
+                ]
             }
-        }
+        });
+
+        // When the user moves their mouse over the highlight layer, we'll update the
+        // feature state for the feature under the mouse.
+        map.on('mousemove', 'highlight', function (e) {
+            if (e.features.length > 0) {
+                if (countryID) {
+                    map.setFeatureState(
+                        { source: 'natearth', sourceLayer: 'ne_10m_admin_0_countries-67qiye', id: countryID,  },
+                        { hover: false }
+                    );
+                }
+                countryID = e.features[0].id;
+                map.setFeatureState(
+                    { source: 'natearth', sourceLayer: 'ne_10m_admin_0_countries-67qiye', id: countryID },
+                    { hover: true }
+                );
+            }
+        });
+
+        // When the mouse leaves the state-fill layer, update the feature state of the
+        // previously hovered feature.
+        map.on('mouseleave', 'highlight', function () {
+            if (countryID) {
+                map.setFeatureState(
+                    { source: 'natearth', sourceLayer:'ne_10m_admin_0_countries-67qiye', id: countryID },
+                    { hover: false }
+                );
+            }
+            countryID = null;
+        });
+
+        // Clickity click
+        map.on('click', 'countries', function (e) {
+            if (Game.playing) {
+                var features = map.queryRenderedFeatures(e.point);
+
+                correct_code = Game.currentCountry['alpha3Code'];
+                correct_location = Game.currentCountry['latlng'];
+                guess_code = features[0]['properties']['ADM0_A3_IS'];
+                guess_location = Game.countriesConvert[guess_code];
+
+                // If you just clicked on a country you've already guessed
+                if (Game.previousCountriesISO.includes(guess_code)) {
+                    /// TODO
+                } else {
+                    // Adds it to the list of previous countries
+                    Game.previousCountriesISO.push(correct_code);
+
+                    // If the guess is correct, stores the value in a variable and updates the filter 
+                    if (correct_code === guess_code) {
+                        var score = 1; // full score for correct guess
+                        Game.absScore += 1;
+                        Game.correctCountriesISO.push(correct_code);
+                        map.setFilter('correct', ['in', 'ADM0_A3_IS'].concat(Game.correctCountriesISO));
+                    } else {
+                        var score = getScore(guess_location, correct_location); // calc score using distance
+                        Game.incorrectCountriesISO.push(correct_code);
+                        map.setFilter('incorrect', ['in', 'ADM0_A3_IS'].concat(Game.incorrectCountriesISO));
+                    }
+
+                    // Fly to the correct location
+                    map.flyTo({ center: correct_location.reverse() });
+
+                    // Yeets score to score-plus span and sets its color
+                    $('#scores-plus').text('+' + score.toFixed(2));
+                    $('#scores-plus').css("color", getColor(score));
+
+                    // Updates the score
+                    Game.score += score;
+                    Game.nextCountry();
+                }
+            }
+        });
     });
 
     // Detects click on the start button, and calls a function
