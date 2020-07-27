@@ -84,7 +84,6 @@ $(function () {
     // Highlighting for selection
     map.on('mousemove', 'countries', function (e) {
         var features = map.queryRenderedFeatures(e.point);
-        console.log(features)
 
         // Change the cursor style as a UI indicator.
         map.getCanvas().style.cursor = 'pointer';
