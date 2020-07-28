@@ -42,6 +42,8 @@ $(function () {
             }
         },
         finishGame: function () {
+            console.log("Game ended!");
+            $('#totals-wrapper').show();
             $('#playing-wrapper').addClass('slideup');
 
             $('#final-score').text(this.score.toFixed(2) + '/' + this.playableCountryNum);
