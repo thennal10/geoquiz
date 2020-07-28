@@ -16,7 +16,7 @@ decreasing function (y = e<sup>-8x</sup>) to give a score between 0 and 1. Obvio
 will be a lot more lenient for, say, guessing countries in Europe as opposed to guessing countries in Africa,
 but I had to make a compromise.
 
-### 201 countries? There are only X countries in the world!
+## 201 countries? There are only X countries in the world!
 
 A - Eat shit. B - The UN recognizes 193 countries as, well, countries, but the only internationally recognized
 system that uniformly assigns an *identifier* to each "country" is the ISO 3166 standard, which lists 249 designated
@@ -24,7 +24,8 @@ territories. This, however, includes dependant territories, and the quiz is hard
 pruned a lot of em out. However, I did leave in some well known ones, like Greenland. Hong Kong, Taiwan, and Macau
 are also included, because fuck China. Disputed territories are a spiky subject, but I went with how Natural Earth
 drew the borders. In particular, Western Sahara isn't included, but Kosovo and Palestine are. Antartica is included too because yes.
-Here's the entire list of pruned countries in table form:
+
+### Countries not included
 
 | Country | Sovereignty | Notes|
 | --- | --- | --- |
