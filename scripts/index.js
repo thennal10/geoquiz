@@ -125,7 +125,7 @@ $(function () {
                     { source: 'natearth', sourceLayer: 'ne_10m_admin_0_countries-67qiye', id: countryID },
                     { hover: true }
                 );
-            }
+            };
         });
 
         // When the mouse leaves the state-fill layer, update the feature state of the
@@ -136,51 +136,63 @@ $(function () {
                     { source: 'natearth', sourceLayer:'ne_10m_admin_0_countries-67qiye', id: countryID },
                     { hover: false }
                 );
-            }
+            };
             countryID = null;
         });
 
         // Clickity click
         map.on('click', 'countries', function (e) {
             if (Game.playing) {
-                var features = map.queryRenderedFeatures(e.point);
+                var properties = map.queryRenderedFeatures(e.point)[0]['properties'];
 
-                correct_code = Game.currentCountry['alpha3Code'];
-                correct_location = Game.currentCountry['latlng'];
-                guess_code = features[0]['properties']['ADM0_A3_IS'];
-                guess_location = Game.countriesConvert[guess_code];
+                // If you clicked on a territory or a glacier or something that isn't a country
+                // Make a popup
+                if (properties['ADM0_A3_IS'] == '-99') {
+                    // Peak coding
+                    const link = 'https://github.com/thennal10/geoquiz#201-countries-there-are-only-x-countries-in-the-world';
+                    new mapboxgl.Popup()
+                        .setLngLat(e['lngLat'])
+                        .setHTML(`<b>${properties['NAME']}</b> <br> <a href=${link} target="_blank"> Not a country.</a>`)
+                        .addTo(map);
+                } 
+                else {
+                    correct_code = Game.currentCountry['alpha3Code'];
+                    correct_location = Game.currentCountry['latlng'];
+                    guess_code = properties['ADM0_A3_IS'];
+                    guess_location = Game.countriesConvert[guess_code];
 
-                // If you just clicked on a country you've already guessed
-                if (Game.previousCountriesISO.includes(guess_code)) {
-                    /// TODO
-                } else {
-                    // Adds it to the list of previous countries
-                    Game.previousCountriesISO.push(correct_code);
-
-                    // If the guess is correct, stores the value in a variable and updates the filter 
-                    if (correct_code === guess_code) {
-                        var score = 1; // full score for correct guess
-                        Game.absScore += 1;
-                        Game.correctCountriesISO.push(correct_code);
-                        map.setFilter('correct', ['in', 'ADM0_A3_IS'].concat(Game.correctCountriesISO));
+                    // If you just clicked on a country you've already guessed
+                    if (Game.previousCountriesISO.includes(guess_code)) {
+                        /// TODO
                     } else {
-                        var score = getScore(guess_location, correct_location); // calc score using distance
-                        Game.incorrectCountriesISO.push(correct_code);
-                        map.setFilter('incorrect', ['in', 'ADM0_A3_IS'].concat(Game.incorrectCountriesISO));
-                    }
+                        // Adds it to the list of previous countries
+                        Game.previousCountriesISO.push(correct_code);
 
-                    // Fly to the correct location
-                    map.flyTo({ center: correct_location.reverse() });
+                        // If the guess is correct, stores the value in a variable and updates the filter 
+                        if (correct_code === guess_code) {
+                            var score = 1; // full score for correct guess
+                            Game.absScore += 1;
+                            Game.correctCountriesISO.push(correct_code);
+                            map.setFilter('correct', ['in', 'ADM0_A3_IS'].concat(Game.correctCountriesISO));
+                        } else {
+                            var score = getScore(guess_location, correct_location); // calc score using distance
+                            Game.incorrectCountriesISO.push(correct_code);
+                            map.setFilter('incorrect', ['in', 'ADM0_A3_IS'].concat(Game.incorrectCountriesISO));
+                        }
 
-                    // Yeets score to score-plus span and sets its color
-                    $('#scores-plus').text('+' + score.toFixed(2));
-                    $('#scores-plus').css("color", getColor(score));
+                        // Fly to the correct location
+                        map.flyTo({ center: correct_location.reverse() });
 
-                    // Updates the score
-                    Game.score += score;
-                    Game.nextCountry();
-                }
-            }
+                        // Yeets score to score-plus span and sets its color
+                        $('#scores-plus').text('+' + score.toFixed(2));
+                        $('#scores-plus').css("color", getColor(score));
+
+                        // Updates the score
+                        Game.score += score;
+                        Game.nextCountry();
+                    };
+                };
+            };
         });
     });
 
