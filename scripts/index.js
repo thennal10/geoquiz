@@ -12,7 +12,7 @@ $(function () {
         previousCountriesISO: [], // All previous countries (A3 codes)
         correctCountriesISO: [], // Countries guessed correctly
         incorrectCountriesISO: [], // Countries guessed wrong
-        playing: false, // Whether the game has started
+        playing: false,
         score: 0,
         absScore: 0, // 1 for getting it exactly right, 0 otherwise
         startGame() {
@@ -42,7 +42,6 @@ $(function () {
             }
         },
         finishGame: function () {
-            $('#totals-wrapper').show();
             $('#playing-wrapper').addClass('slideup');
 
             $('#final-score').text(this.score.toFixed(2) + '/' + this.playableCountryNum);
