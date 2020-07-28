@@ -23,7 +23,7 @@ system that uniformly assigns an *identifier* to each "country" is the ISO 3166 
 territories. This, however, includes dependant territories, and the quiz is hard enough without them, so I
 pruned a lot of em out. However, I did leave in some well known ones, like Greenland. Hong Kong, Taiwan, and Macau
 are also included, because fuck China. Disputed territories are a spiky subject, but I went with how Natural Earth
-drew the borders. In particular, Western Sahara isn't included, but Kosovo and Palestine are. Antartica is included too because yes.
+drew the borders. In particular, Western Sahara isn't included, but Kosovo and Palestine are. Antarctica is included too because yes.
 
 ### Countries not included
 
