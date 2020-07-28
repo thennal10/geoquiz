@@ -1,4 +1,4 @@
-A simple quiz for the geography nerds among us.
+A simple quiz for the geography nerds among us. Made because coronavirus sucks and I'm very bored. Open up an issue if anything breaks.
 
 ## How does this work?
 
