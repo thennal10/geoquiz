@@ -1,4 +1,4 @@
-A simple quiz for the geography nerds among us.
+A simple quiz for the geography nerds among us. Made because coronavirus sucks and I'm very bored. Open up an issue if anything breaks.
 
 ## How does this work?
 
@@ -51,7 +51,7 @@ Here's the entire list of pruned countries in table form:
 | Guam | United States | |
 | Guernsey | British Crown | |
 | Heard Island and McDonald Islands | Australia | |
-| Holy See | UN observer | The natural earth data wasn’t actually detailed enough to include such a small state |
+| Holy See | UN observer | Not included in the Natural Earth data |
 | Isle of Man | British Crown | |
 | Jersey | British Crown | |
 | Martinique | France | |
