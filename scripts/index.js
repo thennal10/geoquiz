@@ -86,6 +86,8 @@ $(function () {
     var countryID = null; // Used for feature-states
 
     map.on('load', function () {
+        map.resize(); // Gaurantees that the map fills the container
+
         // The highlight layer is created at runtime so that we can use feature-states
         // Which is faster at updating than using the filter method
         map.addSource('natearth', {
@@ -128,7 +130,7 @@ $(function () {
             };
         });
 
-        // When the mouse leaves the state-fill layer, update the feature state of the
+        // When the mouse leaves the highlight layer, update the feature state of the
         // previously hovered feature.
         map.on('mouseleave', 'highlight', function () {
             if (countryID) {
