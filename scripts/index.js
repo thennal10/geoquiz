@@ -56,7 +56,7 @@ $(function () {
         }
     };
     // Get a list of countries
-    $.getJSON("https://restcountries.eu/rest/v2/all", function (json) {
+    $.getJSON("https://restcountries.com/v2/all", function (json) {
         Game.allCountries = json;
 
         for (var country of json) {

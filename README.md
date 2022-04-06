@@ -4,7 +4,7 @@ A simple quiz for the geography nerds among us. Made because coronavirus sucks a
 
 ### The code
 This thing is an absolute bodge, if you haven't guessed already, so I haven't really documented much. The country data is sourced
-from [restcountries.eu](https://restcountries.eu/),and Mapbox is for the actual map. Uses a custom tileset, with data from
+from [restcountries.com](https://restcountries.com/),and Mapbox is for the actual map. Uses a custom tileset, with data from
 [Natural Earth](http://www.naturalearthdata.com/). Something like LeafletJS or OpenStreetMap might've been better for this, 
 but hey I already made most of it so ¯\\\_(ツ)_/¯.
 
